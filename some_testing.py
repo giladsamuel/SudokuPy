@@ -2,17 +2,15 @@ import numpy as np
 from square_3x3 import Square3x3
 import requests
 
-response = requests.get(url, headers=headers, params=querystring)
+query = "{newboard(limit:1){grids{value}}}"
 
-print(response.json())
-
-# url = "https://sudoku-api.vercel.app/api/dosuku"
+url = "https://sudoku-api.vercel.app/api/dosuku"
 #
-# response = requests.post(url, json={'query': query})
+response = requests.post(url, json={'query': query})
 #
 # # somethong = [[[1, 2, 3], [4, 5, 6], [7, 8, 9]] for _ in range(3)]
 # print(response)
-# print(response.json())
+print(response.json())
 # arr1 = np.array([1, 2, 3])
 # arr2 = arr1.copy()
 #
