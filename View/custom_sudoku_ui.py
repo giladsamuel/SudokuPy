@@ -21,6 +21,9 @@ def GenButtonMap():
               Cmds.CLEAR: "Clear"}
 
 class CustomMainWindow(QMainWindow, Ui_MainWindow):
+
+
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -30,13 +33,17 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
             for col in range(1, 10):
                 button_name = f"PB_{row}{col}"
                 button = getattr(self, button_name)
-                button.clicked.connect(lambda checked, row=row, col=col: self.cell_clicked(row, col))
+                button.clicked.connect(lambda checked, button=button: self.cell_clicked(button))
 
-    def cell_clicked(self, row, col):
 
+    def cell_clicked(self, button):
+        # TODO focus bug when i minimize the window and return it
+        # TODO Enum?
         BACKSPACE_KEY = '\b'
         DELETE_KEY = '\x7f'
         ZERO_KEY = '0'
+        FOCUSED_STYLE = "background-color: lightblue;"
+        DEFAULT_STYLE = ""
 
         def key_pressed(button, event):
             key = event.text()
@@ -46,9 +53,22 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
             elif key in (ZERO_KEY, BACKSPACE_KEY, DELETE_KEY):
                 button.setText("")
 
-        button = getattr(self, f"PB_{row}{col}")
-        button.setFocus()
+        def set_focus(button):
+            button.setDown(True)
+            button.setStyleSheet(FOCUSED_STYLE)
+
+        def clear_focus(button):
+            button.setDown(False)
+            button.setStyleSheet(DEFAULT_STYLE)
+
+        set_focus(button)
+        button.focusOutEvent = lambda event, button=button: clear_focus(button)
         button.keyPressEvent = lambda event, button=button: key_pressed(button, event)
+
+
+
+
+
 
     #     # Maps to map commands, keys and functions
     #     self.key_table = {k: Cmds.NUM for k in range(QtCore.Qt.Key_0, QtCore.Qt.Key_9+1)}
