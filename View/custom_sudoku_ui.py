@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QLabel
 from .ui_sudoku import Ui_MainWindow
 from enum import Enum, auto
 
@@ -22,48 +22,72 @@ def GenButtonMap():
 
 class CustomMainWindow(QMainWindow, Ui_MainWindow):
 
-
+    # TODO Enum?
+    BACKSPACE_KEY = '\b'
+    DELETE_KEY = '\x7f'
+    ZERO_KEY = '0'
+    SELECTED_STYLE = "background-color: lightblue; border: 2px solid blue;"
+    DEFAULT_STYLE = "background-color: white;"
 
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        button_map = GenButtonMap()
+
+        self.selected_cell = None
+        button_map = GenButtonMap()  #TODO?
 
         for row in range(1, 10):
             for col in range(1, 10):
-                button_name = f"PB_{row}{col}"
-                button = getattr(self, button_name)
-                button.clicked.connect(lambda checked, button=button: self.cell_clicked(button))
+                cell_name = f"Cell_{row}{col}"
+                cell = getattr(self, cell_name)
+                cell.mousePressEvent = lambda event, _cell=cell: self.cell_clicked(_cell)
 
-
-    def cell_clicked(self, button):
-        # TODO focus bug when i minimize the window and return it
-        # TODO Enum?
-        BACKSPACE_KEY = '\b'
-        DELETE_KEY = '\x7f'
-        ZERO_KEY = '0'
-        FOCUSED_STYLE = "background-color: lightblue;"
-        DEFAULT_STYLE = ""
-
-        def key_pressed(button, event):
+    def cell_clicked(self, cell):
+        if self.selected_cell:
+            self.selected_cell.setStyleSheet(self.DEFAULT_STYLE)
+        if cell:
+            self.selected_cell = cell
+            self.selected_cell.setStyleSheet(self.SELECTED_STYLE)
+        else:
+            self.selected_cell.setStyleSheet(self.DEFAULT_STYLE)
+            self.selected_cell = None
+    def keyPressEvent(self, event):
+        if self.selected_cell:
             key = event.text()
             if key.isdigit() and 1 <= int(key) <= 9:
-                button.setText(key)
-                # Add your logic to update the underlying data structure for Sudoku
-            elif key in (ZERO_KEY, BACKSPACE_KEY, DELETE_KEY):
-                button.setText("")
+                self.selected_cell.setText(key)
+            elif key in (self.ZERO_KEY, self.BACKSPACE_KEY, self.DELETE_KEY):
+                self.selected_cell.setText("")
 
-        def set_focus(button):
-            button.setDown(True)
-            button.setStyleSheet(FOCUSED_STYLE)
+    # def cell_clicked(self, button):
+    #     # TODO focus bug when i minimize the window and return it
+    #     # TODO Enum?
+    #     BACKSPACE_KEY = '\b'
+    #     DELETE_KEY = '\x7f'
+    #     ZERO_KEY = '0'
+    #     FOCUSED_STYLE = "background-color: lightblue;"
+    #     DEFAULT_STYLE = "background-color: white;"
+    #
+    #     def key_pressed(button, event):
+    #         key = event.text()
+    #         if key.isdigit() and 1 <= int(key) <= 9:
+    #             button.setText(key)
+    #             # Add your logic to update the underlying data structure for Sudoku
+    #         elif key in (ZERO_KEY, BACKSPACE_KEY, DELETE_KEY):
+    #             button.setText("")
 
-        def clear_focus(button):
-            button.setDown(False)
-            button.setStyleSheet(DEFAULT_STYLE)
+        # def set_focus(button):
+        #     button.setFocus()
+        #     button.setDown(True)
+        #     button.setStyleSheet(FOCUSED_STYLE)
 
-        set_focus(button)
-        button.focusOutEvent = lambda event, button=button: clear_focus(button)
-        button.keyPressEvent = lambda event, button=button: key_pressed(button, event)
+        # def clear_focus(button):
+        #     button.setDown(False)
+        #     button.setStyleSheet(DEFAULT_STYLE)
+
+        # set_focus(button)
+        # button.focusOutEvent = lambda event, button=button: clear_focus(button)
+        # button.keyPressEvent = lambda event, button=button: key_pressed(button, event)
 
 
 
