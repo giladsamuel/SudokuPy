@@ -1,7 +1,16 @@
 import numpy as np
 from square_3x3 import Square3x3
 import requests
+celll = 1
 
+
+def get_row_col_from_cell( cell):
+    rc = cell.objectName().split("_")[1]
+    r = int(rc[0])
+    c = int(rc[1])
+    return r, c
+r, c = get_row_col_from_cell(celll)
+print(r,c)
 query = "{newboard(limit:1){grids{value}}}"
 
 url = "https://sudoku-api.vercel.app/api/dosuku"

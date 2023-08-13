@@ -8,7 +8,8 @@ class Square3x3:
     """
 
     def_size = 3
-    def_val = -1
+    def_val = 0
+    err_val = -1
 
     def __init__(self) -> None:
 
@@ -60,8 +61,8 @@ class Square3x3:
         """
         if -1 < row < self.def_size and -1 < col < self.def_size:
             return self.np_2d_array[row][col]
-
-        return self.def_val
+        raise IndexError
+        return self.err_vall
 
     def set_xy(self, row: int, col: int, value: int):
         """

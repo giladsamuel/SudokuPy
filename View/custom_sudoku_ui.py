@@ -1,8 +1,8 @@
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMainWindow, QLabel
+from PyQt5.QtWidgets import QMainWindow, QTableView
 from .ui_sudoku import Ui_MainWindow
 from enum import Enum, auto
-
+from Model.sudoku_model import SudokuModel
 class Cmds(Enum):
     NUM = auto()
     DEL = auto()
@@ -33,8 +33,16 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
 
+        self.model = SudokuModel()
+
         self.selected_cell = None
+        self.selected_cell_row = None
+        self.selected_cell_col = None
+
         button_map = GenButtonMap()  #TODO?
+
+        self.PB_LoadBoard.clicked.connect(self.load_board_function)
+
         self.mousePressEvent = self.mouse_click_event
 
         for row in range(1, 10):
@@ -42,6 +50,14 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
                 cell_name = f"Cell_{row}{col}"
                 cell = getattr(self, cell_name)
                 cell.mousePressEvent = lambda event, _cell=cell: self.cell_clicked(_cell)
+
+    def get_row_col_from_cell(self, cell):
+        rc = cell.objectName().split("_")[1]
+        r = int(rc[0])
+        c = int(rc[1])
+        print("r =", r)
+        print("c =", c)
+        return r, c
 
     def mouse_click_event(self, event):
         # Reset the selected cell to None if user clicks outside the cell grid
@@ -53,6 +69,7 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
         if self.selected_cell:
             self.selected_cell.setStyleSheet(self.DEFAULT_STYLE)
         self.selected_cell = cell
+        self.selected_cell_row, self.selected_cell_col = self.get_row_col_from_cell(self.selected_cell)
         self.selected_cell.setStyleSheet(self.SELECTED_STYLE)
 
     def keyPressEvent(self, event):
@@ -60,9 +77,17 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
             key = event.text()
             if key.isdigit() and 1 <= int(key) <= 9:
                 self.selected_cell.setText(key)
-                # Add your logic to update the underlying data structure for Sudoku TODO
+                row, col = self.get_row_col_from_cell(self.selected_cell)
+                self.model.set_number(row-1, col-1, int(key))
             elif key in (self.ZERO_KEY, self.BACKSPACE_KEY, self.DELETE_KEY):
                 self.selected_cell.setText("")
+                row, col = self.get_row_col_from_cell(self.selected_cell)
+                self.model.set_number(row-1, col-1, 0)
+
+    def load_board_function(self):
+        print("Button clicked!")
+
+
 
 
     #     # Maps to map commands, keys and functions
