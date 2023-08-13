@@ -35,6 +35,7 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
 
         self.selected_cell = None
         button_map = GenButtonMap()  #TODO?
+        self.mousePressEvent = self.mouse_click_event
 
         for row in range(1, 10):
             for col in range(1, 10):
@@ -42,56 +43,26 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
                 cell = getattr(self, cell_name)
                 cell.mousePressEvent = lambda event, _cell=cell: self.cell_clicked(_cell)
 
+    def mouse_click_event(self, event):
+        # Reset the selected cell to None if user clicks outside the cell grid
+        if self.selected_cell:
+            self.selected_cell.setStyleSheet(self.DEFAULT_STYLE)
+        self.selected_cell = None
+
     def cell_clicked(self, cell):
         if self.selected_cell:
             self.selected_cell.setStyleSheet(self.DEFAULT_STYLE)
-        if cell:
-            self.selected_cell = cell
-            self.selected_cell.setStyleSheet(self.SELECTED_STYLE)
-        else:
-            self.selected_cell.setStyleSheet(self.DEFAULT_STYLE)
-            self.selected_cell = None
+        self.selected_cell = cell
+        self.selected_cell.setStyleSheet(self.SELECTED_STYLE)
+
     def keyPressEvent(self, event):
         if self.selected_cell:
             key = event.text()
             if key.isdigit() and 1 <= int(key) <= 9:
                 self.selected_cell.setText(key)
+                # Add your logic to update the underlying data structure for Sudoku TODO
             elif key in (self.ZERO_KEY, self.BACKSPACE_KEY, self.DELETE_KEY):
                 self.selected_cell.setText("")
-
-    # def cell_clicked(self, button):
-    #     # TODO focus bug when i minimize the window and return it
-    #     # TODO Enum?
-    #     BACKSPACE_KEY = '\b'
-    #     DELETE_KEY = '\x7f'
-    #     ZERO_KEY = '0'
-    #     FOCUSED_STYLE = "background-color: lightblue;"
-    #     DEFAULT_STYLE = "background-color: white;"
-    #
-    #     def key_pressed(button, event):
-    #         key = event.text()
-    #         if key.isdigit() and 1 <= int(key) <= 9:
-    #             button.setText(key)
-    #             # Add your logic to update the underlying data structure for Sudoku
-    #         elif key in (ZERO_KEY, BACKSPACE_KEY, DELETE_KEY):
-    #             button.setText("")
-
-        # def set_focus(button):
-        #     button.setFocus()
-        #     button.setDown(True)
-        #     button.setStyleSheet(FOCUSED_STYLE)
-
-        # def clear_focus(button):
-        #     button.setDown(False)
-        #     button.setStyleSheet(DEFAULT_STYLE)
-
-        # set_focus(button)
-        # button.focusOutEvent = lambda event, button=button: clear_focus(button)
-        # button.keyPressEvent = lambda event, button=button: key_pressed(button, event)
-
-
-
-
 
 
     #     # Maps to map commands, keys and functions
