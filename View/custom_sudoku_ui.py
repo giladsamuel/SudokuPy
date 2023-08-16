@@ -85,7 +85,7 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
                 self.model.set_number(row-1, col-1, 0)
 
     def load_board_function(self):
-        print("Button clicked!")
+        print(self.model)
 
 
 
