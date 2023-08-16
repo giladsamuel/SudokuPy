@@ -19,7 +19,7 @@ class Sudoku:
         square = self.board[row / 3][col / 3]
         return square.get_cell(row//3, col//3)
 
-    def is_valid(self) -> bool:
+    def is_valid(self) -> bool:  #TODO
         for i in range(3):
             for j in range(3):
                 pass
