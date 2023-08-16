@@ -2,7 +2,7 @@ from square_3x3 import Square3x3
 
 
 class Sudoku:
-    def __init__(self):
+    def __init__(self):  # TODO inheritance and overriding
         self.board = [[Square3x3() for _ in range(3)] for _ in range(3)]
 
     @classmethod
