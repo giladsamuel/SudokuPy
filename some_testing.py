@@ -1,25 +1,108 @@
 import numpy as np
 from square_3x3 import Square3x3
-import requests
-celll = 1
+# import requests
+# Create a 9x9 2D array (list of lists)
+big_array = [
+    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [2, 5, 6, 7, 8, 9, 1, 2, 3],
+    [3, 5, 6, 7, 8, 9, 1, 2, 3],
+    [4, 5, 6, 7, 8, 9, 1, 2, 3],
+    [5, 5, 6, 7, 8, 9, 1, 2, 3],
+    [6, 5, 6, 7, 8, 9, 1, 2, 3],
+    [7, 5, 6, 7, 8, 9, 1, 2, 3],
+    [8, 5, 6, 7, 8, 9, 1, 2, 3],
+    [9, 8, 9, 1, 2, 3, 4, 5, 6]
+]
 
+# Initialize a list to store the 3x3 subarrays
+subarrays = []
 
-def get_row_col_from_cell( cell):
-    rc = cell.objectName().split("_")[1]
-    r = int(rc[0])
-    c = int(rc[1])
-    return r, c
-r, c = get_row_col_from_cell(celll)
-print(r,c)
-query = "{newboard(limit:1){grids{value}}}"
+# Iterate over rows of the big array with step size 3
+for row in range(0, 9, 3):
+    # Iterate over columns of the big array with step size 3
+    for col in range(0, 9, 3):
+        # Create a 3x3 subarray by slicing the big array
+        subarray = [big_array[i][col:col+3] for i in range(row, row+3)]
+        subarrays.append(subarray)
 
-url = "https://sudoku-api.vercel.app/api/dosuku"
+# Print the subarrays
+for subarray in subarrays:
+    for row in subarray:
+        print(row)
+    print()
+
 #
-response = requests.post(url, json={'query': query})
+# def load_sudoku_board(difficulty="Hard"):
+#     query = f"""
+#     {{
+#       newboard(limit: 1) {{
+#         grids {{
+#           value
+#           solution
+#           difficulty
+#         }}
+#       }}
+#     }}
+#     """
+#     url = "https://sudoku-api.vercel.app/api/dosuku?query=" + query
 #
-# # somethong = [[[1, 2, 3], [4, 5, 6], [7, 8, 9]] for _ in range(3)]
-# print(response)
-print(response.json())
+#     # try:
+#     print(query)
+#     response = requests.get(url)
+#     print(response)
+#     data = response.json()
+#     print(data)
+#     if "newboard" in data and "grids" in data["newboard"] and len(data["newboard"]["grids"]) > 0:
+#         sudoku_data = data["newboard"]["grids"][0]
+#         print("type", type(sudoku_data["value"]))
+#         return sudoku_data
+#     else:
+#         print("No Sudoku data found in the response.")
+#         return None
+#     # except Exception as e:
+#     #     print("Error:", e)
+#     #     return None
+#
+#
+# # Example usage
+# if __name__ == "__main__":
+#     sudoku_data = load_sudoku_board()
+#     if sudoku_data:
+#         print("Sudoku Value:\n", sudoku_data["value"])
+#         print("Sudoku Solution:\n", sudoku_data["solution"])
+#         print("Sudoku Difficulty:", sudoku_data["difficulty"])
+#
+# # def load_sudoku_board():
+# #     url = "https://sudoku-api.vercel.app/api/dosuku?query={newboard(limit:1){grids{value,solution,difficulty},results,message}}"
+# #
+# #     try:
+#         response = requests.get(url)
+#         data = response.json()
+#
+#         if "newboard" in data and "grids" in data["newboard"] and len(data["newboard"]["grids"]) > 0:
+#             sudoku_data = data["newboard"]["grids"][0]
+#             return sudoku_data
+#         else:
+#             print("No Sudoku data found in the response.")
+#             return None
+#     except Exception as e:
+#         print("Error:", e)
+#         return None
+# if __name__ == "__main__":
+#     sudoku_data = load_sudoku_board()
+#     if sudoku_data:
+#         print("Sudoku Value:\n", sudoku_data["value"])
+#         print("Sudoku Solution:\n", sudoku_data["solution"])
+#         print("Sudoku Difficulty:", sudoku_data["difficulty"])
+# query = ""
+#
+# url = "https://sudoku-api.vercel.app/api/dosuku"
+# #
+# response = requests.post(url, json={'query': query})
+# #
+# # # somethong = [[[1, 2, 3], [4, 5, 6], [7, 8, 9]] for _ in range(3)]
+# # print(response)
+# print(response.json())
 # arr1 = np.array([1, 2, 3])
 # arr2 = arr1.copy()
 #

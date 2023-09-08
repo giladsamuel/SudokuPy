@@ -2,6 +2,9 @@ from PyQt5.QtWidgets import QMainWindow
 from .ui_sudoku import Ui_MainWindow
 from enum import Enum, auto
 from Model.sudoku_model import SudokuModel
+import requests
+
+
 class Cmds(Enum):
     NUM = auto()
     DEL = auto()
@@ -27,6 +30,7 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
     ZERO_KEY = '0'
     SELECTED_STYLE = "background-color: lightblue; border: 2px solid blue;"
     DEFAULT_STYLE = "background-color: white;"
+    query = """{newboard(limit: 1) {grids {value, solution, difficulty}results,message}}"""
 
     def __init__(self):
         super().__init__()
@@ -38,8 +42,8 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
 
         button_map = GenButtonMap()  #TODO?
 
-        self.PB_LoadBoard.clicked.connect(self.load_board_function)
-
+        self.PB_LoadBoard.clicked.connect(self.load_board_from_api)
+        self.PB_PrintBoard.clicked.connect(lambda: print(self.model))
         self.mousePressEvent = self.mouse_click_event
 
         for row in range(9):
@@ -72,10 +76,32 @@ class CustomMainWindow(QMainWindow, Ui_MainWindow):
                 row, col = self.selected_cell.property('row'), self.selected_cell.property('col')
                 self.model.set_number(row, col, 0)
 
-    def load_board_function(self):
-        print(self.model)
+    def load_api_view(self, sudoko_board):  #TODO decorator?
+        for row in range(9):
+            for col in range(9):
+                cell_name = f"Cell_{row}{col}"
+                cell = getattr(self, cell_name)
+                if sudoko_board[row][col] == 0:
+                    cell.setText("")
+                else:
+                    cell.setText(str(sudoko_board[row][col]))
 
+    def load_board_from_api(self):
+        query = '{newboard(limit:1){grids{value,solution,difficulty},results,message}}'
+        url = f'https://sudoku-api.vercel.app/api/dosuku?query={query}'
 
+        try:
+            response = requests.get(url)
+            data = response.json()
+
+            if "newboard" in data and "grids" in data["newboard"] and len(data["newboard"]["grids"]) > 0:
+                sudoku_data = data["newboard"]["grids"][0]
+                self.model.load_api_data(sudoku_data["value"])
+                self.load_api_view(sudoku_data["value"])
+            else:
+                print("No Sudoku data found in the response.")
+        except requests.exceptions.ConnectionError as e:
+            print("Error:", e)  #TODO inform the user with GUI window to try again
 
 
     #     # Maps to map commands, keys and functions
